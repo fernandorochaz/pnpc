@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Licitações</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Consulta de Licitações</h1>
+    </header>
+    <main>
+        <form action="/search" method="POST">
+            <div class="form-group">
+                <label for="data_inicial">Data Inicial:</label>
+                <input type="date" id="data_inicial" name="data_inicial" required>
+            </div>
+            <div class="form-group">
+                <label for="data_final">Data Final:</label>
+                <input type="date" id="data_final" name="data_final" required>
+            </div>
+            <div class="form-group">
+                <label for="palavras_chave">Palavras-chave (separadas por vírgula):</label>
+                <input type="text" id="palavras_chave" name="palavras_chave" placeholder="Exemplo: alimento, construção">
+            </div>
+            <button type="submit">Pesquisar</button>
+        </form>
+    </main>
+</body>
+</html>
+

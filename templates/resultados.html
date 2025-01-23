@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados da Consulta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Resultados da Consulta</h1>
+        <a href="/">Voltar</a>
+    </header>
+    <main>
+        <section>
+            <h2>Gráfico de Distribuição</h2>
+            {% if graph_path %}
+                <img src="{{ url_for('static', filename=graph_path.split('/')[-1]) }}" alt="Gráfico de Distribuição">
+            {% else %}
+                <p>Nenhum gráfico gerado.</p>
+            {% endif %}
+        </section>
+        <section>
+            <h2>Dados das Licitações</h2>
+            <h3>Primeiros 10 Resultados Filtrados:</h3>
+            {% if df_filtrado and not df_filtrado.empty %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Orgão</th>
+                            <th>Estado</th>
+                            <th>Objeto</th>
+                            <th>Valor Estimado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for _, row in df_filtrado.iterrows() %}
+                            <tr>
+                                <td>{{ row['orgao'] }}</td>
+                                <td>{{ row['uf'] }}</td>
+                                <td>{{ row['objeto'] }}</td>
+                                <td>{{ row['valor_estimado'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Não há dados para exibir.</p>
+            {% endif %}
+        </section>
+        <section>
+            <h3>Download de Resultados:</h3>
+            <a href="{{ url_for('download', filename=file_path.split('/')[-1]) }}" class="download-btn">Baixar Excel</a>
+        </section>
+    </main>
+</body>
+</html>
