@@ -1,32 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta de Licitações</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Consulta de Licitações</h1>
-    </header>
-    <main>
-        <form action="/search" method="POST">
-            <div class="form-group">
-                <label for="data_inicial">Data Inicial:</label>
-                <input type="date" id="data_inicial" name="data_inicial" required>
-            </div>
-            <div class="form-group">
-                <label for="data_final">Data Final:</label>
-                <input type="date" id="data_final" name="data_final" required>
-            </div>
-            <div class="form-group">
-                <label for="palavras_chave">Palavras-chave (separadas por vírgula):</label>
-                <input type="text" id="palavras_chave" name="palavras_chave" placeholder="Exemplo: alimento, construção">
-            </div>
-            <button type="submit">Pesquisar</button>
-        </form>
-    </main>
+    <h1>Consulta de Licitações</h1>
+    <form action="{{ url_for('fetch_licitacoes') }}" method="post">
+        <label for="uf">Estado (UF):</label>
+        <select id="uf" name="uf" class="select2">
+        </select>
+        <br>
+
+        <label for="modalidade">Modalidade:</label>
+        <select id="modalidade" name="modalidade" class="select2">
+        </select>
+        <br>
+
+        <label for="municipio">Município:</label>
+        <select id="municipio" name="municipio" class="select2">
+        </select>
+        <br>
+
+        <label for="unidade">Unidade Administrativa:</label>
+        <select id="unidade" name="unidade" class="select2">
+        </select>
+        <br>
+
+        <button type="submit">Buscar Licitações</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            // Inicializar Select2
+            $('.select2').select2();
+
+            // Preencher as opções de UF
+            $.getJSON('/get_ufs', function(data) {
+                data.forEach(function(uf) {
+                    $('#uf').append(new Option(uf.sigla + " - " + uf.nome, uf.id));
+                });
+            });
+
+            // Preencher as modalidades
+            $.getJSON('/get_modalidades', function(data) {
+                data.forEach(function(modalidade) {
+                    $('#modalidade').append(new Option(modalidade.descricao, modalidade.codigo));
+                });
+            });
+
+            // Atualizar municípios ao selecionar UF
+            $('#uf').change(function() {
+                var uf_id = $(this).val();
+                $('#municipio').empty();
+                $.getJSON('/get_municipios/' + uf_id, function(data) {
+                    data.forEach(function(municipio) {
+                        $('#municipio').append(new Option(municipio.nome, municipio.codigo_ibge));
+                    });
+                });
+            });
+
+            // Preencher as unidades administrativas
+            $.getJSON('/get_unidades', function(data) {
+                data.forEach(function(unidade) {
+                    $('#unidade').append(new Option(unidade.nome, unidade.codigo));
+                });
+            });
+        });
+    </script>
 </body>
 </html>
-

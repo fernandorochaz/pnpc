@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 import requests
 from datetime import datetime
@@ -6,6 +7,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 from os.path import expanduser
+from config.settings import Config
+from config.database import db
+from routes.main import main
 
 # -*- coding: utf-8 -*-
 
@@ -14,6 +18,13 @@ plt.style.use('ggplot')
 
 # Inicializar a aplicação Flask
 app = Flask(__name__)
+app.config.from_object(Config)
+
+# Inicializa o banco de dados
+db.init_app(app)
+
+# Registra as rotas
+app.register_blueprint(main)
 
 # Defina o diretório de Downloads do usuário
 downloads_dir = os.path.join(expanduser("~"), "Downloads")  # Acessa a pasta Downloads do usuário logado
@@ -85,18 +96,11 @@ def fetch_licitacoes(data_inicial, data_final, palavras_chave):
 
     return df, df_filtrado
 
-
-    print("Colunas do DataFrame:", df.columns)
-
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Defina o diretório de Downloads do usuário
-downloads_dir = os.path.join(expanduser("~"), "Downloads")  # Acessa a pasta Downloads do usuário logado
-
+# Função de busca de licitações
 @app.route('/search', methods=['POST'])
 def search():
     data_inicial = request.form.get('data_inicial', '')
@@ -142,8 +146,6 @@ def search():
                            df_filtrado=df_filtrado.head(10) if df_filtrado is not None and not df_filtrado.empty else None,
                            file_path=file_path,
                            graph_path=graph_path)
-
-
 
 @app.route('/download/<filename>')
 def download(filename):
